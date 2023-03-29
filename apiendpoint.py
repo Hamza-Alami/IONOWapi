@@ -1,37 +1,41 @@
-import streamlit as st
 import requests
+import streamlit as st
+from flask import Flask, jsonify
 
-base_urls = [
-    'https://valead.bitrix24.com/rest/2593/1qypbfjokvl3q7n9/crm.deal.list.json?Filter[STAGE_ID]=C51:WON&',
-    'https://valead.bitrix24.com/rest/2593/0yy34uz3ome8hk4o/crm.deal.list.json?Filter[STAGE_ID]=C51:NEW&',
-    'https://valead.bitrix24.com/rest/2593/rg46gyrl6kfedteu/crm.deal.list.json?Filter[STAGE_ID]=C51:LOSE&',
-    'https://valead.bitrix24.com/rest/2593/tcdo9l8bdswx5t2t/crm.deal.list.json?Filter[STAGE_ID]=C51:1&',
-    'https://valead.bitrix24.com/rest/2593/2c0lhsi6b0biyo44/crm.deal.list.json?Filter[STAGE_ID]=C51:EXECUTING&',
-    'https://valead.bitrix24.com/rest/2593/vjpem3zwd2k5tzff/crm.deal.list.json?Filter[STAGE_ID]=C51:FINAL_INVOICE&',
-    'https://valead.bitrix24.com/rest/2593/tjp12j1b4wp8bap5/crm.deal.list.json?Filter[STAGE_ID]=C51:PREPARATION&'
-]
+app = Flask(__name__)
 
-data = []
-for url in base_urls:
-    start = 0
-    count = 50
+@app.route('/')
+def get_data():
+    base_urls = [
+        'https://valead.bitrix24.com/rest/2593/1qypbfjokvl3q7n9/crm.deal.list.json?Filter[STAGE_ID]=C51:WON&',
+        'https://valead.bitrix24.com/rest/2593/0yy34uz3ome8hk4o/crm.deal.list.json?Filter[STAGE_ID]=C51:NEW&',
+        'https://valead.bitrix24.com/rest/2593/rg46gyrl6kfedteu/crm.deal.list.json?Filter[STAGE_ID]=C51:LOSE&',
+        'https://valead.bitrix24.com/rest/2593/tcdo9l8bdswx5t2t/crm.deal.list.json?Filter[STAGE_ID]=C51:1&',
+        'https://valead.bitrix24.com/rest/2593/2c0lhsi6b0biyo44/crm.deal.list.json?Filter[STAGE_ID]=C51:EXECUTING&',
+        'https://valead.bitrix24.com/rest/2593/vjpem3zwd2k5tzff/crm.deal.list.json?Filter[STAGE_ID]=C51:FINAL_INVOICE&',
+        'https://valead.bitrix24.com/rest/2593/tjp12j1b4wp8bap5/crm.deal.list.json?Filter[STAGE_ID]=C51:PREPARATION&'
+    ]
 
-    # Retrieve the total number of records
-    response = requests.get(f"{url}&start={start}&select[]=ID&count=1")
-    total_records = response.json()['total']
+    data = []
+    for url in base_urls:
+        start = 0
+        count = 50
 
-    while start < total_records:
-        url_with_params = f"{url}&start={start}"
-        response = requests.get(url_with_params)
-        response_json = response.json()
+        # Retrieve the total number of records
+        response = requests.get(f"{url}&start={start}&select[]=ID&count=1")
+        total_records = response.json()['total']
 
-        data.extend(response_json['result'])
-        start += 50  # update start parameter to retrieve next 50 records
+        while start < total_records:
+            url_with_params = f"{url}&start={start}"
+            response = requests.get(url_with_params)
+            response_json = response.json()
 
-try:
-    @app.route('/get_data')
-    def get_data():
+            data.extend(response_json['result'])
+            start += 50  # update start parameter to retrieve next 50 records
+
+    try:
+        st.write(f"Retrieved {len(data)} records")
         return jsonify(data)
-    st.write("Success")
-except Exception as e:
-    st.write(f"Failure: {str(e)}")
+    except Exception as e:
+        st.write(f"Error: {e}")
+        return "Failure"
