@@ -8,7 +8,6 @@ import os, sys
 import base64
 import requests
 import io
-import xlsxwriter
 from io import BytesIO
 import lxml
 import json
