@@ -41,4 +41,4 @@ for url in base_urls:
         start += 50  # update start parameter to retrieve next 50 records
 
 
-print(f"Retrieved {len(data)} records")
+st.write(f"Retrieved {len(data)} records")
