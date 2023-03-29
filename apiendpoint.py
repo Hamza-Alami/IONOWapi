@@ -19,11 +19,13 @@ for url in base_urls:
     # Retrieve the total number of records
     response = requests.get(f"{url}&start={start}&select[]=ID&count=1")
     total_records = response.json()['total']
+    print(f"Total records for {url}: {total_records}")
 
     while start < total_records:
         url_with_params = f"{url}&start={start}"
         response = requests.get(url_with_params)
         response_json = response.json()
+        print(f"Response for {url_with_params}: {response_json}")
 
         data.extend(response_json['result'])
         start += 50  # update start parameter to retrieve next 50 records
