@@ -1,9 +1,5 @@
 import streamlit as st
 import requests
-import time
-
-import requests
-import time
 
 base_urls = [
     'https://valead.bitrix24.com/rest/2593/1qypbfjokvl3q7n9/crm.deal.list.json?Filter[STAGE_ID]=C51:WON&',
@@ -31,7 +27,15 @@ for url in base_urls:
 
         data.extend(response_json['result'])
         start += 50  # update start parameter to retrieve next 50 records
-        
 
-st.write(f"Retrieved {len(data)} records")
 
+# Serve the data as a JSON API
+@st.cache(show_spinner=False)
+def get_data():
+    return data
+
+data = get_data()
+
+st.header("Bitrix24 Deals")
+
+st.json(data)
