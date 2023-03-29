@@ -1,11 +1,8 @@
-import requests
 import streamlit as st
-from flask import Flask, jsonify
+import requests
 
-app = Flask(__name__)
-
-@app.route('/')
-def get_data():
+@st.cache(suppress_st_warning=True)
+def get_bitrix_data():
     base_urls = [
         'https://valead.bitrix24.com/rest/2593/1qypbfjokvl3q7n9/crm.deal.list.json?Filter[STAGE_ID]=C51:WON&',
         'https://valead.bitrix24.com/rest/2593/0yy34uz3ome8hk4o/crm.deal.list.json?Filter[STAGE_ID]=C51:NEW&',
@@ -19,7 +16,6 @@ def get_data():
     data = []
     for url in base_urls:
         start = 0
-        count = 50
 
         # Retrieve the total number of records
         response = requests.get(f"{url}&start={start}&select[]=ID&count=1")
@@ -33,25 +29,41 @@ def get_data():
             data.extend(response_json['result'])
             start += 50  # update start parameter to retrieve next 50 records
 
-    try:
-        st.write(f"Retrieved {len(data)} records")
-        return jsonify(data)
-    except Exception as e:
-        st.write(f"Error: {e}")
-        return "Failure"
+    return data
 
-# Start the Flask app using Streamlit's magic command
-if __name__ == '__main__':
-    from streamlit.hashing import CryptoProtocol
-    from streamlit.report_thread import REPORT_CONTEXT_ATTR_NAME
-    from streamlit.server.Server import Server
-    
-    server = Server()
-    server._is_running = True
-    server._crypto = CryptoProtocol()
-    setattr(
-        st,
-        REPORT_CONTEXT_ATTR_NAME,
-        st.ReportThread.get_or_create_report_ctx()
-    )
-    app.run(debug=False, port=8080)
+@st.cache(suppress_st_warning=True, allow_output_mutation=True)
+def get_data():
+    return get_bitrix_data()
+
+@st.experimental_memoization
+def get_records():
+    data = get_data()
+    records = {"data": data}
+    return records
+
+@st.cache(suppress_st_warning=True)
+def get_total_records():
+    data = get_data()
+    total_records = {"total_records": len(data)}
+    return total_records
+
+@st.cache(suppress_st_warning=True)
+def get_filtered_records(filter_value):
+    data = get_data()
+    filtered_data = [d for d in data if d['STAGE_ID'] == filter_value]
+    records = {"data": filtered_data}
+    return records
+
+# Define Streamlit app
+def app():
+    st.set_page_config(page_title="Bitrix24 Deals Data", page_icon=":money_with_wings:")
+
+    st.header("Bitrix24 Deals Data API")
+    st.subheader("All Deals")
+    st.markdown("This endpoint returns all the deals data from Bitrix24.")
+
+    records = get_records()
+    total_records = get_total_records()
+
+    st.write(records)
+    st.write(total)
