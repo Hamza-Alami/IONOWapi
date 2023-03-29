@@ -1,7 +1,8 @@
 import streamlit as st
 import requests
+import time
 
-@st.cache(suppress_st_warning=True)
+@st.cache
 def get_bitrix_data():
     base_urls = [
         'https://valead.bitrix24.com/rest/2593/1qypbfjokvl3q7n9/crm.deal.list.json?Filter[STAGE_ID]=C51:WON&',
@@ -16,6 +17,7 @@ def get_bitrix_data():
     data = []
     for url in base_urls:
         start = 0
+        count = 50
 
         # Retrieve the total number of records
         response = requests.get(f"{url}&start={start}&select[]=ID&count=1")
@@ -31,39 +33,27 @@ def get_bitrix_data():
 
     return data
 
-@st.cache(suppress_st_warning=True, allow_output_mutation=True)
-def get_data():
-    return get_bitrix_data()
+# Get Bitrix data
+bitrix_data = get_bitrix_data()
 
-@st.experimental_memoization
-def get_records():
-    data = get_data()
-    records = {"data": data}
-    return records
+# Create API endpoint
+@st.cache
+def get_api_data():
+    return bitrix_data
 
-@st.cache(suppress_st_warning=True)
-def get_total_records():
-    data = get_data()
-    total_records = {"total_records": len(data)}
-    return total_records
+api_data = get_api_data()
 
-@st.cache(suppress_st_warning=True)
-def get_filtered_records(filter_value):
-    data = get_data()
-    filtered_data = [d for d in data if d['STAGE_ID'] == filter_value]
-    records = {"data": filtered_data}
-    return records
+# Define API endpoint route and response format
+@st.cache
+def api_endpoint():
+    return {
+        "/get_data": api_data
+    }
 
-# Define Streamlit app
-def app():
-    st.set_page_config(page_title="Bitrix24 Deals Data", page_icon=":money_with_wings:")
+# Display API endpoint URL on Streamlit app
+st.write("API endpoint URL: ", st.experimental_get_query_params()["origin"][0] + "/get_data")
 
-    st.header("Bitrix24 Deals Data API")
-    st.subheader("All Deals")
-    st.markdown("This endpoint returns all the deals data from Bitrix24.")
-
-    records = get_records()
-    total_records = get_total_records()
-
-    st.write(records)
-    st.write(total)
+# Run Streamlit app
+if __name__ == "__main__":
+    app = st.create_web_app(api_endpoint)
+    app.run()
