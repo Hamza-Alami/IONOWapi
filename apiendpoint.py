@@ -6,7 +6,6 @@ from datetime import datetime as dt
 from datetime import timedelta
 import os, sys
 import base64
-import plost
 import requests
 import io
 import xlsxwriter
