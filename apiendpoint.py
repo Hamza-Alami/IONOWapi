@@ -51,7 +51,11 @@ def api_endpoint():
     }
 
 # Display API endpoint URL on Streamlit app
-st.write("API endpoint URL: ", st.experimental_get_query_params()["origin"][0] + "/get_data")
+# Display API endpoint URL on Streamlit app
+if "origin" in st.experimental_get_query_params():
+    st.write("API endpoint URL: ", st.experimental_get_query_params()["origin"][0] + "/get_data")
+else:
+    st.write("API endpoint URL: N/A")
 
 # Run Streamlit app
 if __name__ == "__main__":
