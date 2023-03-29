@@ -9,7 +9,6 @@ import base64
 import requests
 import io
 from io import BytesIO
-import lxml
 import json
 from datetime import date
 import time
