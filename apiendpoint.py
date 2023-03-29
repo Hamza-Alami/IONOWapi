@@ -4,7 +4,6 @@ import numpy as np
 import datetime
 from datetime import datetime as dt
 from datetime import timedelta
-import matplotlib.pyplot as plt
 import os, sys
 import base64
 import plost
