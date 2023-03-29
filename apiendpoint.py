@@ -39,3 +39,19 @@ def get_data():
     except Exception as e:
         st.write(f"Error: {e}")
         return "Failure"
+
+# Start the Flask app using Streamlit's magic command
+if __name__ == '__main__':
+    from streamlit.hashing import CryptoProtocol
+    from streamlit.report_thread import REPORT_CONTEXT_ATTR_NAME
+    from streamlit.server.Server import Server
+    
+    server = Server()
+    server._is_running = True
+    server._crypto = CryptoProtocol()
+    setattr(
+        st,
+        REPORT_CONTEXT_ATTR_NAME,
+        st.ReportThread.get_or_create_report_ctx()
+    )
+    app.run(debug=False, port=8080)
