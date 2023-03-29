@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 import time
-import streamlit.server as server
 
 @st.cache
 def get_bitrix_data():
