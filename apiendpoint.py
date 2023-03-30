@@ -36,5 +36,17 @@ for url in base_urls:
 with open("data.json", "w") as f:
     f.write(json.dumps(data))
 
+# Add a download button for the data.json file
+with open("data.json", "r") as f:
+    file_data = f.read()
+
+st.download_button(
+    label="Download data.json",
+    data=file_data,
+    file_name="data.json",
+    mime="application/json"
+)
+
 # Print success message
 st.success("Data saved to data.json")
+
