@@ -1,7 +1,7 @@
 import requests
 import streamlit as st
-from streamlit import share
 
+# Base URLs for Bitrix API
 base_urls = [
     'https://valead.bitrix24.com/rest/2593/1qypbfjokvl3q7n9/crm.deal.list.json?Filter[STAGE_ID]=C51:WON&',
     'https://valead.bitrix24.com/rest/2593/0yy34uz3ome8hk4o/crm.deal.list.json?Filter[STAGE_ID]=C51:NEW&',
@@ -12,6 +12,7 @@ base_urls = [
     'https://valead.bitrix24.com/rest/2593/tjp12j1b4wp8bap5/crm.deal.list.json?Filter[STAGE_ID]=C51:PREPARATION&'
 ]
 
+# Retrieve data from Bitrix API
 data = []
 for url in base_urls:
     start = 0
@@ -29,7 +30,10 @@ for url in base_urls:
         data.extend(response_json['result'])
         start += 50  # update start parameter to retrieve next 50 records
 
-st.write(data)
 
-share_url = share.get_public_share_url()
-st.write(f"Use this URL to access the data: {share_url}")
+# Save data to a file
+with open("data.json", "w") as f:
+    f.write(json.dumps(data))
+
+# Print success message
+st.success("Data saved to data.json")
