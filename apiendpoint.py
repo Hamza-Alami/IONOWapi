@@ -1,5 +1,7 @@
 import streamlit as st
-import requests
+from flask import Flask, jsonify
+
+app = Flask(__name__)
 
 base_urls = [
     'https://valead.bitrix24.com/rest/2593/1qypbfjokvl3q7n9/crm.deal.list.json?Filter[STAGE_ID]=C51:WON&',
@@ -32,12 +34,10 @@ for url in base_urls:
 
 
 # Serve the data as a JSON API
-@st.cache(show_spinner=False)
-def get_data():
-    return data
+@app.route('/data')
+def serve_data():
+    return jsonify(data)
 
-data = get_data()
+if __name__ == '__main__':
+    app.run(port=8000)
 
-st.header("Bitrix24 Deals")
-
-st.json(data)
