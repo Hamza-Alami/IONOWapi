@@ -1,6 +1,5 @@
 import streamlit as st
 import requests
-import pandas as pd
 
 base_urls = [
     'https://valead.bitrix24.com/rest/2593/1qypbfjokvl3q7n9/crm.deal.list.json?Filter[STAGE_ID]=C51:WON&',
@@ -18,13 +17,13 @@ for url in base_urls:
     count = 50
 
     # Retrieve the total number of records
-    response = requests.get(f"{url}&start={start}&select[]=ID&count=1")
+    response = requests.get(f"{url}&start={start}&select[]=ID&count=1", allow_redirects=False)
     total_records = response.json()['total']
     print(f"Total records for {url}: {total_records}")
 
     while start < total_records:
         url_with_params = f"{url}&start={start}"
-        response = requests.get(url_with_params)
+        response = requests.get(url_with_params, allow_redirects=False)
         response_json = response.json()
         print(f"Response for {url_with_params}: {response_json}")
 
@@ -41,5 +40,4 @@ data = get_data()
 
 st.header("Bitrix24 Deals")
 
-df = pd.DataFrame(data) # Create a DataFrame from the data
-st.dataframe(df) # Display the DataFrame in Streamlit
+st.json(data)
