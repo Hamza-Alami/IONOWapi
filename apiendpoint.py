@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import pandas as pd
 
 base_urls = [
     'https://valead.bitrix24.com/rest/2593/1qypbfjokvl3q7n9/crm.deal.list.json?Filter[STAGE_ID]=C51:WON&',
@@ -40,4 +41,5 @@ data = get_data()
 
 st.header("Bitrix24 Deals")
 
-st.json(data)
+df = pd.DataFrame(data) # Create a DataFrame from the data
+st.dataframe(df) # Display the DataFrame in Streamlit
