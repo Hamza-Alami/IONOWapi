@@ -1,7 +1,7 @@
-import streamlit as st
 import requests
-import pandas as pd
+import streamlit as st
 
+# Base URLs for Bitrix API
 base_urls = [
     'https://valead.bitrix24.com/rest/2593/1qypbfjokvl3q7n9/crm.deal.list.json?Filter[STAGE_ID]=C51:WON&',
     'https://valead.bitrix24.com/rest/2593/0yy34uz3ome8hk4o/crm.deal.list.json?Filter[STAGE_ID]=C51:NEW&',
@@ -12,6 +12,7 @@ base_urls = [
     'https://valead.bitrix24.com/rest/2593/tjp12j1b4wp8bap5/crm.deal.list.json?Filter[STAGE_ID]=C51:PREPARATION&'
 ]
 
+# Retrieve data from Bitrix API
 data = []
 for url in base_urls:
     start = 0
@@ -20,26 +21,19 @@ for url in base_urls:
     # Retrieve the total number of records
     response = requests.get(f"{url}&start={start}&select[]=ID&count=1")
     total_records = response.json()['total']
-    print(f"Total records for {url}: {total_records}")
 
     while start < total_records:
         url_with_params = f"{url}&start={start}"
         response = requests.get(url_with_params)
         response_json = response.json()
-        print(f"Response for {url_with_params}: {response_json}")
 
         data.extend(response_json['result'])
         start += 50  # update start parameter to retrieve next 50 records
 
 
-# Serve the data as a JSON API
-@st.cache(show_spinner=False)
-def get_data():
-    return data
+# Save data to a file
+with open("data.json", "w") as f:
+    f.write(json.dumps(data))
 
-data = get_data()
-
-st.header("Bitrix24 Deals")
-
-df = pd.DataFrame(data) # Create a DataFrame from the data
-st.dataframe(df) # Display the DataFrame in Streamlit
+# Print success message
+st.success("Data saved to data.json")
